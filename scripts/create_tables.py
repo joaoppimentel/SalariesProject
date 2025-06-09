@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS salaries (
 )''')
 
 df = pd.read_csv('./data/ds_salaries.csv')
-df.to_sql('salaries', conn, if_exists='replace', index=False)
+df.to_sql('salaries', conn, index=True)
 
 conn.commit()
 
