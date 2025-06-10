@@ -13,8 +13,9 @@ def main():
     create_view()
 
     dashboard_page = st.Page("./frontend/dashboard.py", title="Dashboard", icon="🏠", default=True)
+    table_page = st.Page('./frontend/table_page.py', title='Table View')
 
-    pg = st.navigation([dashboard_page,])
+    pg = st.navigation([dashboard_page, table_page])
     pg.run()
 
 
