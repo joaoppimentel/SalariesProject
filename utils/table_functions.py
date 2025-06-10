@@ -28,9 +28,9 @@ def create_view():
             salary_in_usd,
             employee_residence,
             CASE remote_ratio
-                WHEN 0 THEN 'On-site'
-                WHEN 50 THEN 'Hybrid'
-                WHEN 100 THEN 'Remote'
+                WHEN 0 THEN 'No Remote'
+                WHEN 50 THEN 'Parcially Remote'
+                WHEN 100 THEN 'Full Remote'
             END AS remote_ratio,
             company_location,
             CASE company_size
