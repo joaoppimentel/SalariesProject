@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
-from utils.table_functions import create_view, return_df, filter_df, return_unique
+from utils.table_functions import return_df_view, filter_df, return_unique
 
-create_view()
-
-df = return_df()
+df = return_df_view()
 
 st.title('Salary Report')
 col1, col2, col3, col4 = st.columns(4)

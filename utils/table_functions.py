@@ -43,7 +43,7 @@ def create_view():
     conn.commit()
     conn.close()
 
-def return_df():
+def return_df_view():
     conn = sqlite3.connect('salaries.db', check_same_thread=False)
 
     df = pd.read_sql_query("SELECT * FROM salaries_view", conn)
