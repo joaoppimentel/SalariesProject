@@ -25,7 +25,6 @@ def create_view():
             job_title,
             salary,
             salary_currency,
-            salary_currency,
             employee_residence,
             CASE remote_ratio
                 WHEN 0 THEN 'On-site'
