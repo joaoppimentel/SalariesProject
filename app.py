@@ -3,7 +3,7 @@ from utils.database import execute_query ,create_table, fill_table
 from utils.table_functions import create_view
 
 def main():
-    st.set_page_config(page_title="Sistema Academia", layout="wide")
+    st.set_page_config(page_title="Salary Report Analysis", layout="wide")
 
     create_table()
     table_count = execute_query("SELECT COUNT(*) FROM salaries", fetch=True)[0][0]
@@ -13,7 +13,7 @@ def main():
     create_view()
 
     dashboard_page = st.Page("./frontend/dashboard.py", title="Dashboard", icon="🏠", default=True)
-    table_page = st.Page('./frontend/table_page.py', title='Table View')
+    table_page = st.Page('./frontend/table_page.py', title='Table View', icon='📋')
 
     pg = st.navigation([dashboard_page, table_page])
     pg.run()

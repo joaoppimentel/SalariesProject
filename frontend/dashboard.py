@@ -1,4 +1,5 @@
 import streamlit as st
+<<<<<<< HEAD
 import pandas as pd
 from utils.dashboard_utils import get_df, salary_infos,salary_map, alpha2_to_alpha3, companies_diff_salaries, employment_type_mean, linechart_jobtitle
 import seaborn as sns
@@ -46,3 +47,24 @@ with col5:
 
 
 linechart_jobtitle()
+=======
+from utils.dashboard_functions import return_df_view_by_year, year_filter, highest_average_salary, average_groupby_linechart
+
+st.title("Dashoard 🏠")
+year = year_filter()
+
+df = return_df_view_by_year()
+
+bn_col1, bn_col2, bn_col3 = st.columns(3)
+
+with bn_col1:
+    highest_average_salary(df, year, 'remote_ratio')
+
+with bn_col2:
+    highest_average_salary(df, year, 'company_location')
+
+with bn_col3:
+    pass
+
+average_groupby_linechart(df, 'employment_type')
+>>>>>>> 51e4ddb62451ef8ffbb2fa2d559c63ebbd0569a9

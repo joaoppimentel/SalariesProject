@@ -25,12 +25,12 @@ def create_view():
             job_title,
             salary,
             salary_currency,
-            salary_currency,
+            salary_in_usd,
             employee_residence,
             CASE remote_ratio
-                WHEN 0 THEN 'On-site'
-                WHEN 50 THEN 'Hybrid'
-                WHEN 100 THEN 'Remote'
+                WHEN 0 THEN 'No Remote'
+                WHEN 50 THEN 'Parcially Remote'
+                WHEN 100 THEN 'Full Remote'
             END AS remote_ratio,
             company_location,
             CASE company_size
@@ -74,7 +74,7 @@ def filter_df(df, work_year=None, experience_level=None, employment_type=None, j
     if salary_in_usd is not None and salary_in_usd > 0.0:
         df = df.loc[df['salary_in_usd'] == salary_in_usd]
     if employee_residence is not None and employee_residence != 'All':
-        df = df.loc[df['employe_residence'] == employee_residence]
+        df = df.loc[df['employee_residence'] == employee_residence]
     if remote_ratio is not None and remote_ratio != 'All':
         df = df.loc[df['remote_ratio'] == remote_ratio]
     if company_location is not None and company_location != 'All':
