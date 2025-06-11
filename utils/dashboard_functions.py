@@ -67,8 +67,41 @@ def highest_average_salary(df, year, column):
             value= f'{salary}$ | {column_name}'
         )
 
-def most_frequent():
-    pass
+def most_frequent(df, year, column):
+    if year == 'All':
+        column_frequency = df.groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        highest_column = column_frequency.iloc[column_frequency['frequency'].idxmax()]
+        frequency = highest_column['frequency']
+        column_name = highest_column[column]
+        highest_frequency_metric = st.metric(
+            label=f'Highest frequency {column.replace('_', ' ')}',
+            value= f'{frequency} | {column_name}'
+        )  
+    elif (year-1) in df['work_year'].values:
+        column_frequency_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        column_frequency_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        highest_column_current_year = column_frequency_current_year.iloc[column_frequency_current_year['frequency'].idxmax()]
+        highest_column_last_year = column_frequency_last_year.iloc[column_frequency_last_year['frequency'].idxmax()]
+        frequency_current_year = highest_column_current_year['frequency']
+        frequency_last_year = highest_column_last_year['frequency']
+        delta = frequency_current_year - frequency_last_year
+        delta_percentage = round((delta/frequency_last_year)*100, 2)
+        column_current_year = highest_column_current_year[column]
+        column_last_year = highest_column_last_year[column]
+        highest_average_metric = st.metric(
+            label=f'Highest frequency {column.replace('_', ' ')}',
+            value=f'{frequency_current_year} | {column_current_year}',
+            delta=f'{delta_percentage}% | {column_last_year}'
+        )
+    else:
+        column_frequency = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        highest_column = column_frequency.iloc[column_frequency['frequency'].idxmax()]
+        frequency = highest_column['frequency']
+        column_name = highest_column[column]
+        highest_average_metric = st.metric(
+            label=f'Highest frequency {column.replace('_', ' ')}',
+            value= f'{frequency} | {column_name}'
+        )
 
 def full_counts(df, year, column):
     pass
