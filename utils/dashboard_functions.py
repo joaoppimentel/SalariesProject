@@ -21,11 +21,12 @@ def year_filter():
     
     return year
 
-def return_df_view_by_year():
+def return_df():
 
     conn = sqlite3.connect('salaries.db', check_same_thread=False)
 
     df = pd.read_sql_query("SELECT * FROM salaries_view", conn)
+    
 
     conn.close()
     return df

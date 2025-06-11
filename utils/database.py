@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlite3
+from dashboard_utils import alpha2_to_alpha3
 
 def execute_query(query, params=None, fetch=False, db_path='salaries.db'):
     """
@@ -49,6 +50,8 @@ def create_table():
 
 def fill_table():
     df = pd.read_csv('./data/ds_salaries.csv')
+    df['company_location'] = df['company_location'].apply(alpha2_to_alpha3)
+    df['employee_residence'] = df['employee_residence'].apply(alpha2_to_alpha3)
     
     query = """
     INSERT INTO salaries (
