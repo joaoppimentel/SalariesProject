@@ -70,41 +70,68 @@ def highest_average_salary(df, year, column):
 def most_frequent(df, year, column):
     if year == 'All':
         column_frequency = df.groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        total = column_frequency['frequency'].sum()
         highest_column = column_frequency.iloc[column_frequency['frequency'].idxmax()]
         frequency = highest_column['frequency']
+        frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Highest frequency {column.replace('_', ' ')}',
-            value= f'{frequency} | {column_name}'
+            label=f'Most frequent {column.replace('_', ' ')}',
+            value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )  
     elif (year-1) in df['work_year'].values:
         column_frequency_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
         column_frequency_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        total = column_frequency_current_year['frequency'].sum()
         highest_column_current_year = column_frequency_current_year.iloc[column_frequency_current_year['frequency'].idxmax()]
         highest_column_last_year = column_frequency_last_year.iloc[column_frequency_last_year['frequency'].idxmax()]
         frequency_current_year = highest_column_current_year['frequency']
+        frequency_current_year_percentage = round((frequency_current_year/total)*100, 2)
         frequency_last_year = highest_column_last_year['frequency']
         delta = frequency_current_year - frequency_last_year
         delta_percentage = round((delta/frequency_last_year)*100, 2)
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_average_metric = st.metric(
-            label=f'Highest frequency {column.replace('_', ' ')}',
-            value=f'{frequency_current_year} | {column_current_year}',
+            label=f'Most frequent {column.replace('_', ' ')}',
+            value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
             delta=f'{delta_percentage}% | {column_last_year}'
         )
     else:
         column_frequency = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
+        total = column_frequency['frequency'].sum()
         highest_column = column_frequency.iloc[column_frequency['frequency'].idxmax()]
         frequency = highest_column['frequency']
+        frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
-            label=f'Highest frequency {column.replace('_', ' ')}',
-            value= f'{frequency} | {column_name}'
+            label=f'Most frequent {column.replace('_', ' ')}',
+            value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )
 
-def full_counts(df, year, column):
-    pass
+def full_counts(df, year):
+    if year == 'All':
+        total_employees = df.shape[0]
+        total_employees_metric = st.metric(
+            label=f'Total employees',
+            value= f'{total_employees}'
+        )  
+    elif (year-1) in df['work_year'].values:
+        total_employees_current_year = df.loc[df['work_year'] == year].shape[0]
+        total_employees_last_year = df.loc[df['work_year'] == year-1].shape[0]
+        delta = total_employees_current_year - total_employees_last_year
+        delta_percentage = round((delta/total_employees_last_year)*100, 2)
+        total_employees_metric = st.metric(
+            label=f'Total employees',
+            value=f'{total_employees_current_year}',
+            delta=f'{delta_percentage}% | {total_employees_last_year}'
+        )
+    else:
+        total_employees = df.loc[df['work_year'] == year].shape[0]
+        total_employees_metric = st.metric(
+            label=f'Total emplyees',
+            value= f'{total_employees}'
+        )
 
 def average_groupby_linechart(df, column):
     test = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
