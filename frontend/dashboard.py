@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 from utils.dashboard_utils import salary_infos,salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
-from utils.dashboard_functions import year_filter, return_df_view_by_year, highest_average_salary, most_frequent, full_counts, average_groupby_linechart
+from utils.dashboard_functions import year_filter, return_df, highest_average_salary, most_frequent, full_counts, average_groupby_linechart
 import seaborn as sns
 
 
 st.title("Dashoard 🏠")
 year = year_filter()
-df = return_df_view_by_year()
+df = return_df()
 
 st.markdown('### Big Numbers')
 col1, col2, col3 = st.columns(3)
@@ -29,7 +29,9 @@ with col3.container(border=True):
 
 
 with st.container(border=True):
-    choice2 = st.selectbox('Average Salary Throughout The Year By:', ['Employment Type', 'Experience Level', 'Company Size'])
+    col7, col8, col9 = st.columns(3)
+    with col7:
+        choice2 = st.selectbox('Average Salary Throughout The Year By:', ['Employment Type', 'Experience Level', 'Company Size'])
     if choice2 == 'Employment Type':
         average_groupby_linechart(df, 'employment_type')
     elif choice2 == 'Experience Level':
