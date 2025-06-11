@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.dashboard_functions import return_df_view_by_year, year_filter, highest_average_salary
+from utils.dashboard_functions import return_df_view_by_year, year_filter, highest_average_salary, average_groupby_linechart
 
 st.title("Dashoard 🏠")
 year = year_filter()
@@ -16,3 +16,5 @@ with bn_col2:
 
 with bn_col3:
     pass
+
+average_groupby_linechart(df, 'employment_type')

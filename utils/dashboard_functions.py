@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import sqlite3
+import plotly.express as px
 
 def year_filter():
 
@@ -71,3 +72,10 @@ def most_frequent():
 
 def full_counts(df, year, column):
     pass
+
+def average_groupby_linechart(df, column):
+    test = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+    test['work_year'] = test['work_year'].astype('str')
+    fig = px.line(test, x='work_year', y='average_salary', color='remote_ratio', symbol='remote_ratio', facet_col=column, markers=True, labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, title=f'Average salary by {column.replace('_', ' ')} throughout the years')
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+    st.plotly_chart(fig)
