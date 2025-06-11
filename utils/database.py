@@ -1,6 +1,6 @@
 import pandas as pd
 import sqlite3
-from dashboard_utils import alpha2_to_alpha3
+from utils.dashboard_utils import alpha2_to_alpha3
 
 def execute_query(query, params=None, fetch=False, db_path='salaries.db'):
     """
