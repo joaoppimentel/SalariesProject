@@ -1,35 +1,37 @@
 import streamlit as st
 import pandas as pd
-from utils.dashboard_utils import salary_infos,salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
-from utils.dashboard_functions import year_filter, return_df_view_by_year, highest_average_salary, most_frequent, full_counts, average_groupby_linechart
+from utils.dashboard_utils import salary_infos, salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
+from utils.dashboard_functions import year_filter, return_df, highest_average_salary, most_frequent, full_counts, average_groupby_linechart
 import seaborn as sns
 
 
-st.title("Dashoard 🏠")
+st.title("📊 Salaries Dashboard")
 year = year_filter()
-df = return_df_view_by_year()
+df = return_df()
 
-st.markdown('### Big Numbers')
+st.header('Big Numbers')
 col1, col2, col3 = st.columns(3)
-st.divider()
-st.markdown('### Graphs')
-col4, col5 = st.columns(2)
-
-col6 = st.columns(1)
-
 
 with col1.container(border=True):
     highest_average_salary(df, year,'remote_ratio')
+    highest_average_salary(df, year, 'company_location')
 
 with col2.container(border=True):
-    highest_average_salary(df, year, 'company_location')
+    
 
 with col3.container(border=True):
     most_frequent(df, year, 'remote_ratio')
 
+st.divider()
+
+
+
+st.header('Graphs')
 
 with st.container(border=True):
-    choice2 = st.selectbox('Average Salary Throughout The Year By:', ['Employment Type', 'Experience Level', 'Company Size'])
+    col5, _, _ = st.columns(3)
+    with col5:
+        choice2 = st.selectbox('Average Salary Throughout The Year By:', ['Employment Type', 'Experience Level', 'Company Size'])
     if choice2 == 'Employment Type':
         average_groupby_linechart(df, 'employment_type')
     elif choice2 == 'Experience Level':

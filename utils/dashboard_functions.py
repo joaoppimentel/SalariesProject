@@ -26,7 +26,6 @@ def return_df():
     conn = sqlite3.connect('salaries.db', check_same_thread=False)
 
     df = pd.read_sql_query("SELECT * FROM salaries_view", conn)
-    
 
     conn.close()
     return df
@@ -135,8 +134,8 @@ def full_counts(df, year):
         )
 
 def average_groupby_linechart(df, column):
-    test = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
-    test['work_year'] = test['work_year'].astype('str')
-    fig = px.line(test, x='work_year', y='average_salary', color='remote_ratio', symbol='remote_ratio', facet_col=column, markers=True, labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, title=f'Average salary by {column.replace('_', ' ')} throughout the years')
+    average_salary_groupby = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+    average_salary_groupby['work_year'] = average_salary_groupby['work_year'].astype('str')
+    fig = px.line(average_salary_groupby, x='work_year', y='average_salary', color='remote_ratio', symbol='remote_ratio', facet_col=column, markers=True, labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, title=f'Average salary by {column.replace('_', ' ')} throughout the years')
     fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
     st.plotly_chart(fig)

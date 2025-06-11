@@ -4,7 +4,7 @@ from utils.table_functions import return_df_view, filter_df, return_unique
 
 df = return_df_view()
 
-st.title('Salary Report')
+st.title('📋 Salaries Report')
 col1, col2, col3, col4 = st.columns(4)
 
 enable_filters = st.checkbox('Filters', value=False)
