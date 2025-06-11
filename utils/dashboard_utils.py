@@ -33,44 +33,40 @@ def salary_infos():
     df_filtered2 = (df_filtered2.groupby('job_title')['growth%'].mean().sort_values(ascending=False).reset_index())
     return result
 
-def salary_map(choice):
-    df = get_df()
-    df['alpha3_employees_residence'] = df['employee_residence'].apply(alpha2_to_alpha3)
-    df['alpha3_company_location'] = df['company_location'].apply(alpha2_to_alpha3)
-
+def salary_map(choice, df, year):
+    if year != 'All':
+        df = df.loc[df['work_year']==year]
     if choice == 'Employees Residence':
-        df_map = df.groupby('alpha3_employees_residence')['salary_in_usd'].mean().reset_index()
+        df_map = df.groupby('employee_residence')['salary_in_usd'].mean().reset_index()
         fig = px.choropleth(
         df_map,
-        locations='alpha3_employees_residence', 
+        locations='employee_residence', 
         locationmode='ISO-3',            
         color='salary_in_usd',           
-        hover_name='alpha3_employees_residence', 
+        hover_name='employee_residence', 
         color_continuous_scale='Viridis',
     )
         fig.update_layout(
         autosize=False,
         margin=dict(l=0, r=0, t=0, b=0),
     )
-
         st.plotly_chart(fig)
     else:
-        df_map = df.groupby('alpha3_company_location')['salary_in_usd'].mean().reset_index()
+        df_map = df.groupby('company_location')['salary_in_usd'].mean().reset_index()
         fig = px.choropleth(
         df_map,
-        locations='alpha3_company_location', 
+        locations='company_location', 
         locationmode='ISO-3',            
         color='salary_in_usd',           
-        hover_name='alpha3_company_location', 
+        hover_name='company_location', 
         color_continuous_scale='Viridis',
     )
         fig.update_layout(
         autosize=False,
         margin=dict(l=0, r=0, t=0, b=0),
     )
-
         st.plotly_chart(fig)
-
+ 
 
 def alpha2_to_alpha3(alpha2_code):
     try:
@@ -103,12 +99,20 @@ def employment_type_mean():
     fig = px.bar(result, x='employment_type', y='Média Salarial', labels={'employment_type':'Tipo de Contrato'})
     st.plotly_chart(fig)
 
-def linechart_jobtitle():
-    query = """
-    SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries
-    GROUP BY job_title, company_size
-"""
-    result = pd.read_sql_query(query, conn)
+def linechart_jobtitle(year):
+    if year != 'All':
+        query = """
+        SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries
+        WHERE work_year = ?
+        GROUP BY job_title, company_size
+    """
+        result = pd.read_sql_query(query, conn, params=(year,))
+    else:
+        query = """
+        SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries
+        GROUP BY job_title, company_size
+    """
+        result = pd.read_sql_query(query, conn)
     fig = px.bar(result, x='job_title', y='media', color='company_size', barmode='group')
     fig.update_xaxes(tickangle= 45)
     st.plotly_chart(fig)
