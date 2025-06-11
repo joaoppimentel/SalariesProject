@@ -95,7 +95,8 @@ def most_frequent(df, year, column):
         highest_average_metric = st.metric(
             label=f'Most frequent {column.replace('_', ' ')}',
             value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
-            delta=f'{delta_percentage}% | {column_last_year}'
+            delta=f'{delta_percentage}% | {column_last_year}',
+            help=f"Number of employees of this category by year. The delta refers to last year's most frequent {column.replace('_', ' ')}"
         )
     else:
         column_frequency = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
@@ -119,18 +120,42 @@ def full_counts(df, year):
     elif (year-1) in df['work_year'].values:
         total_employees_current_year = df.loc[df['work_year'] == year].shape[0]
         total_employees_last_year = df.loc[df['work_year'] == year-1].shape[0]
-        delta = total_employees_current_year - total_employees_last_year
+        delta = round(total_employees_current_year - total_employees_last_year, 2)
         delta_percentage = round((delta/total_employees_last_year)*100, 2)
         total_employees_metric = st.metric(
             label=f'Total employees',
             value=f'{total_employees_current_year}',
-            delta=f'{delta_percentage}% | {total_employees_last_year}'
+            delta=f'{delta_percentage}% | {delta}'
         )
     else:
         total_employees = df.loc[df['work_year'] == year].shape[0]
         total_employees_metric = st.metric(
             label=f'Total emplyees',
             value= f'{total_employees}'
+        )
+
+def full_averages(df, year):
+    if year == 'All':
+        average_salary = round(df['salary_in_usd'].mean(), 2)
+        average_salary_metric = st.metric(
+            label=f'Overall average salary',
+            value= f'{average_salary}$'
+        )  
+    elif (year-1) in df['work_year'].values:
+        average_salary_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
+        average_salary_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].mean(), 2)
+        delta = round(average_salary_current_year - average_salary_last_year, 2)
+        delta_percentage = round((delta/average_salary_last_year)*100, 2)
+        total_employees_metric = st.metric(
+            label=f'Overall average salary',
+            value=f'{average_salary_current_year}',
+            delta=f'{delta_percentage}% | {delta}$'
+        )
+    else:
+        average_salary = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
+        average_salary_metric = st.metric(
+            label=f'Overall average salary',
+            value= f'{average_salary}$'
         )
 
 def average_groupby_linechart(df, column):
