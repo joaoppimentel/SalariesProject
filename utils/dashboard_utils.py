@@ -26,22 +26,51 @@ def salary_infos():
     SELECT salary_in_usd, job_title, experience_level, work_year FROM salaries
 """
     result = pd.read_sql_query(query, conn)
+    df_filtered2 = result.groupby(['work_year', 'job_title'])['salary_in_usd'].mean().reset_index()
+    df_filtered2 = df_filtered2.sort_values(['work_year', 'job_title'])
+    df_filtered2['growth%'] = (df_filtered2.groupby('job_title')['salary_in_usd'].pct_change() * 100)
+    df_filtered2 = df_filtered2.dropna(subset=['growth%'])
+    df_filtered2 = (df_filtered2.groupby('job_title')['growth%'].mean().sort_values(ascending=False).reset_index())
     return result
 
-def salary_map():
+def salary_map(choice):
     df = get_df()
     df['alpha3_employees_residence'] = df['employee_residence'].apply(alpha2_to_alpha3)
-    df_map = df.groupby('alpha3_employees_residence')['salary_in_usd'].mean().reset_index()
-    fig = px.choropleth(
-    df_map,
-    locations='alpha3_employees_residence', 
-    locationmode='ISO-3',            
-    color='salary_in_usd',           
-    hover_name='alpha3_employees_residence', 
-    color_continuous_scale='Viridis',
-)
+    df['alpha3_company_location'] = df['company_location'].apply(alpha2_to_alpha3)
 
-    st.plotly_chart(fig)
+    if choice == 'Employees Residence':
+        df_map = df.groupby('alpha3_employees_residence')['salary_in_usd'].mean().reset_index()
+        fig = px.choropleth(
+        df_map,
+        locations='alpha3_employees_residence', 
+        locationmode='ISO-3',            
+        color='salary_in_usd',           
+        hover_name='alpha3_employees_residence', 
+        color_continuous_scale='Viridis',
+    )
+        fig.update_layout(
+        autosize=False,
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+
+        st.plotly_chart(fig)
+    else:
+        df_map = df.groupby('alpha3_company_location')['salary_in_usd'].mean().reset_index()
+        fig = px.choropleth(
+        df_map,
+        locations='alpha3_company_location', 
+        locationmode='ISO-3',            
+        color='salary_in_usd',           
+        hover_name='alpha3_company_location', 
+        color_continuous_scale='Viridis',
+    )
+        fig.update_layout(
+        autosize=False,
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+
+        st.plotly_chart(fig)
+
 
 def alpha2_to_alpha3(alpha2_code):
     try:
@@ -63,7 +92,6 @@ def companies_diff_salaries():
 """
     result = pd.read_sql_query(query, conn)
     fig = px.bar(result, x='company_size', y='Média Salarial', labels={'company_size':'Tamanho da Empresa'})
-    
     st.plotly_chart(fig)
 
 def employment_type_mean():
@@ -77,7 +105,7 @@ def employment_type_mean():
 
 def linechart_jobtitle():
     query = """
-    SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries_view
+    SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries
     GROUP BY job_title, company_size
 """
     result = pd.read_sql_query(query, conn)
