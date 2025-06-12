@@ -40,7 +40,7 @@ def highest_average_salary(df, year, column):
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
-            label=f'Highest average salary {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
             value= f'{salary}$ | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
@@ -55,7 +55,7 @@ def highest_average_salary(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_average_metric = st.metric(
-            label=f'Highest average salary {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
             value=f'{salary_current_year}$ | {column_current_year}',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
         )
@@ -65,7 +65,7 @@ def highest_average_salary(df, year, column):
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
-            label=f'Highest average salary {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
             value= f'{salary}$ | {column_name}'
         )
 
@@ -74,37 +74,37 @@ def highest_total_salary(df, year, column):
     column = column.lower().replace(' ', '_')
 
     if year == 'All':
-        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
-        highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
-        salary = round(highest_column['average_salary'], 2)
+        column_total = df.groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        highest_column = column_total.iloc[column_total['total_salary'].idxmax()]
+        salary = round(highest_column['total_salary'], 2)
         column_name = highest_column[column]
-        highest_average_metric = st.metric(
-            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+        highest_total_metric = st.metric(
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
             value= f'{salary}$ | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
-        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
-        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
-        highest_column_current_year = column_average_current_year.iloc[column_average_current_year['average_salary'].idxmax()]
-        highest_column_last_year = column_average_last_year.iloc[column_average_last_year['average_salary'].idxmax()]
-        salary_current_year = round(highest_column_current_year['average_salary'], 2)
-        salary_last_year = round(highest_column_last_year['average_salary'], 2)
+        column_total_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        column_total_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        highest_column_current_year = column_total_current_year.iloc[column_total_current_year['total_salary'].idxmax()]
+        highest_column_last_year = column_total_last_year.iloc[column_total_last_year['total_salary'].idxmax()]
+        salary_current_year = round(highest_column_current_year['total_salary'], 2)
+        salary_last_year = round(highest_column_last_year['total_salary'], 2)
         delta = round(salary_current_year - salary_last_year, 2)
         delta_percentage = round((delta/salary_last_year)*100, 2)
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
-        highest_average_metric = st.metric(
-            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+        highest_total_metric = st.metric(
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
             value=f'{salary_current_year}$ | {column_current_year}',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
         )
     else:
-        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
-        highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
+        column_total = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        highest_column = column_total.iloc[column_total['total_salary'].idxmax()]
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
-        highest_average_metric = st.metric(
-            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+        highest_total_metric = st.metric(
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
             value= f'{salary}$ | {column_name}'
         )
 
@@ -136,7 +136,7 @@ def most_frequent(df, year, column):
         delta_percentage = round((delta/frequency_last_year)*100, 2)
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
-        highest_average_metric = st.metric(
+        highest_frequency_metric = st.metric(
             label=f'Most frequent {column.replace('_', ' ')} | {year}',
             value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
@@ -149,7 +149,7 @@ def most_frequent(df, year, column):
         frequency = highest_column['frequency']
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
-        highest_average_metric = st.metric(
+        highest_frequency_metric = st.metric(
             label=f'Most frequent {column.replace('_', ' ')} | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )
