@@ -39,5 +39,9 @@ else:
     company_location = None
     company_size = None
 
-filtered_df = filter_df(df, work_year=work_year, experience_level=experience_level, employment_type=employment_type, job_title=job_title, salary=salary, salary_currency=salary_currency, salary_in_usd=salary_in_usd, employee_residence=employee_residence, remote_ratio=remote_ratio, company_location=company_location, company_size=company_size)
+filtered_df = filter_df(df, work_year=work_year, experience_level=experience_level, employment_type=employment_type, 
+                        job_title=job_title, salary=salary, salary_currency=salary_currency, 
+                        salary_in_usd=salary_in_usd, employee_residence=employee_residence, remote_ratio=remote_ratio, 
+                        company_location=company_location, company_size=company_size)
+
 st.dataframe(filtered_df, hide_index=True)

@@ -37,13 +37,13 @@ def salary_map(choice, df, year, tab):
 
     match tab:
         case 'mean':
-            title = f'Average salary by {choice.replace('_', ' ')} | {year}'
+            title = f'Average salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {choice.replace('_', ' ')} | {year}'
+            title = f'Total salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Total salary'
         case 'count':
-            title = f'Number of employees by {choice.replace('_', ' ')} | {year}'
+            title = f'Number of employees by {choice.lower().replace('_', ' ')} | {year}'
             label = 'Number of employees'
 
     if year != 'All':
@@ -102,13 +102,13 @@ def linechart_jobtitle(df, year, choice, tab):
 
     match tab:
         case 'mean':
-            title = f'Average job salary by {choice.replace('_', ' ')} | {year}'
+            title = f'Average job salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total job salary by {choice.replace('_', ' ')} | {year}'
+            title = f'Total job salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Total salary'
         case 'count':
-            title = f'Number of job employees by {choice.replace('_', ' ')} | {year}'
+            title = f'Number of job employees by {choice.lower().replace('_', ' ')} | {year}'
             label = 'Number of employees'
 
     if year != 'All':
@@ -121,7 +121,7 @@ def linechart_jobtitle(df, year, choice, tab):
                  y='average_salary', 
                  color=choice, 
                  barmode='group',
-                 labels={choice: choice.title().replace('_', ' '), 'average_salary': label, 'job_title': 'Job title'},
+                 labels={choice: choice.capitalize().replace('_', ' '), 'average_salary': label, 'job_title': 'Job title'},
                  title = title
                  )
     fig.update_xaxes(tickangle= 45, categoryorder='category ascending')
