@@ -86,20 +86,19 @@ def employment_type_mean():
     fig = px.bar(result, x='employment_type', y='Média Salarial', labels={'employment_type':'Tipo de Contrato'})
     st.plotly_chart(fig)
 
-def linechart_jobtitle(year):
+def linechart_jobtitle(df, year, choice):
     if year != 'All':
-        query = """
-        SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries_view
-        WHERE work_year = ?
-        GROUP BY job_title, company_size
-    """
-        result = pd.read_sql_query(query, conn, params=(year,))
-    else:
-        query = """
-        SELECT job_title, COUNT(*) as "Quantidade", company_size, AVG(salary_in_usd) as "media" FROM salaries_view
-        GROUP BY job_title, company_size
-    """
-        result = pd.read_sql_query(query, conn)
-    fig = px.bar(result, x='job_title', y='media', color='company_size', barmode='group', title='Average job salary by company size', labels={'media':'Average salary', 'company_size':'Company size', 'job_title':'Job title'})
-    fig.update_xaxes(tickangle= 45)
+        df = df.loc[df['work_year'] == year]
+    choice = choice.lower().replace(' ', '_')
+    df = df.groupby([choice, 'job_title']).aggregate(average_salary=('salary_in_usd', 'mean')).reset_index()
+    fig = px.bar(
+                df, 
+                 x='job_title', 
+                 y='average_salary', 
+                 color=choice, 
+                 barmode='group',
+                 labels={choice: choice.title().replace('_', ' '), 'average_salary': 'Average Salary', 'job_title': 'Job Title'},
+                 title = f'Average job salary by {choice.title().replace('_', ' ')}'
+                 )
+    fig.update_xaxes(tickangle= 45, categoryorder='category ascending')
     st.plotly_chart(fig)
