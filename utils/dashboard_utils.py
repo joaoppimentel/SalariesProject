@@ -46,7 +46,7 @@ def salary_map(choice, df, year):
         color='salary_in_usd',           
         hover_name=choice, 
         color_continuous_scale='blues',
-        title=f'Average salary throughout the years by {choice.replace('_', ' ')}',
+        title=f'Average salary by {choice.replace('_', ' ')} | {year}',
         labels={'salary_in_usd':'Average salary'}
     )
     fig.update_layout(
@@ -98,7 +98,7 @@ def linechart_jobtitle(df, year, choice):
                  color=choice, 
                  barmode='group',
                  labels={choice: choice.title().replace('_', ' '), 'average_salary': 'Average Salary', 'job_title': 'Job Title'},
-                 title = f'Average job salary by {choice.title().replace('_', ' ')}'
+                 title = f'Average job salary by {choice.replace('_', ' ')}'
                  )
     fig.update_xaxes(tickangle= 45, categoryorder='category ascending')
     st.plotly_chart(fig)

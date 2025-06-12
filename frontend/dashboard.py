@@ -30,9 +30,9 @@ st.header('Charts', divider='gray')
 
 with st.container(border=True):
     st.subheader('Average salary by category')
-    col5, _, _ = st.columns(3)
+    col5, col52, col53 = st.columns(3)
     with col5:
-        choice2 = st.selectbox('Average salary throughout the years by:', ['Employment Type', 'Experience Level', 'Company Size'])
+        choice2 = st.selectbox('Average salary throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
     if choice2 == 'Employment Type':
         average_groupby_linechart(df, 'employment_type')
         average_groupby_barchart(df, year, 'employment_type')
@@ -46,17 +46,36 @@ with st.container(border=True):
 st.divider()
 
 with st.container(border=True):
-    col6, _, _ = st.columns(3)
+    st.subheader('Average salary by country')
+    col6, col62 = st.columns([1,2])
     with col6:
-        choice3 = st.selectbox('Average throughout the years by:', ['Company Location', 'Employee Residence'])
+        choice3 = st.selectbox('Average salary by country of:', ['Company Location', 'Employee Residence'])
+
+    with col62:
+        highest_average_salary(df, year, choice3)
+
     salary_map(choice3, df, year)
 
 st.divider()
 
 
 with st.container(border=True):
-    st.markdown('### ')
-    linechart_jobtitle(year)
+    st.subheader('Average job salary by category')
+    col7, col72 = st.columns([1,2])
+    
+    with col7:
+        choice = st.selectbox('Avarage job salary by:', ['Company Size', 'Experience Level', 'Employment Type', 'Remote Ratio'])
+    
+    with col72:
+        tab1, tab12, tab13 = st.tabs(['Average salary', 'Total salary', 'Most common'])
+        with tab1:
+            highest_average_salary(df, year, 'job_title')
+        with tab12:
+            pass
+        with tab13:
+            most_frequent(df, year, 'job_title')
+
+    linechart_jobtitle(df, year, choice)
 
 
 
