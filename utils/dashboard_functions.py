@@ -158,9 +158,73 @@ def full_averages(df, year):
             value= f'{average_salary}$'
         )
 
+def full_sums(df, year):
+    if year == 'All':
+        salary_budget = round(df['salary_in_usd'].sum(), 2)
+        average_salary_metric = st.metric(
+            label=f'Total salary budget',
+            value= f'{salary_budget}$'
+        )  
+    elif (year-1) in df['work_year'].values:
+        salary_budget_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
+        salary_budget_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].sum(), 2)
+        delta = round(salary_budget_current_year - salary_budget_last_year, 2)
+        delta_percentage = round((delta/salary_budget_last_year)*100, 2)
+        total_employees_metric = st.metric(
+            label=f'Total salary budget',
+            value=f'{salary_budget_current_year}',
+            delta=f'{delta_percentage}% | {delta}$'
+        )
+    else:
+        salary_budget = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
+        average_salary_metric = st.metric(
+            label=f'Total salary budget',
+            value= f'{salary_budget}$'
+        )
+
 def average_groupby_linechart(df, column):
     average_salary_groupby = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
     average_salary_groupby['work_year'] = average_salary_groupby['work_year'].astype('str')
-    fig = px.line(average_salary_groupby, x='work_year', y='average_salary', color='remote_ratio', symbol='remote_ratio', facet_col=column, markers=True, labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, title=f'Average salary by {column.replace('_', ' ')} throughout the years')
+    color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
+    fig = px.line(
+                average_salary_groupby, 
+                x='work_year', 
+                y='average_salary', 
+                color='remote_ratio', 
+                symbol='remote_ratio', 
+                facet_col=column, 
+                markers=True, 
+                labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
+                title=f'Average salary by {column.replace('_', ' ')} throughout the years',
+                color_discrete_map=color_mapping)
     fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
     st.plotly_chart(fig)
+
+def average_groupby_barchart(df, year, column):
+    color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
+    if year == 'All':
+        test = df.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        fig = px.bar(
+                    test, 
+                    x=column, 
+                    y='average_salary', 
+                    color='remote_ratio', 
+                    barmode='group', 
+                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
+                    title=f'Average salary by {column.replace('_', ' ')} | {year}',
+                    color_discrete_map=color_mapping)
+        fig.update_xaxes(categoryorder='category ascending')
+        st.plotly_chart(fig)
+    else:
+        df_year = df.loc[df['work_year'] == year]
+        test = df_year.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        fig = px.bar(
+                    test, x=column, 
+                    y='average_salary', 
+                    color='remote_ratio', 
+                    barmode='group', 
+                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
+                    title=f'Average salary by {column.replace('_', ' ')} | {year}',
+                    color_discrete_map=color_mapping)
+        fig.update_xaxes(categoryorder='category ascending')
+        st.plotly_chart(fig)
