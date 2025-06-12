@@ -49,7 +49,7 @@ def create_table():
     )''')
 
 def fill_table():
-    df = pd.read_csv('./data/ds_salaries.csv')
+    df = pd.read_csv('./data/salaries.csv')
     df['company_location'] = df['company_location'].apply(alpha2_to_alpha3)
     df['employee_residence'] = df['employee_residence'].apply(alpha2_to_alpha3)
     
