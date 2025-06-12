@@ -1,57 +1,62 @@
 import streamlit as st
 import pandas as pd
-from utils.dashboard_utils import salary_infos,salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
-from utils.dashboard_functions import year_filter, return_df, highest_average_salary, most_frequent, full_counts, average_groupby_linechart
+from utils.dashboard_utils import salary_infos, salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
+from utils.dashboard_functions import year_filter, return_df, highest_average_salary, most_frequent, full_counts, average_groupby_linechart, full_averages, average_groupby_barchart, full_sums
 import seaborn as sns
 
 
-st.title("Dashoard 🏠")
+st.title("📊 Salaries Dashboard")
 year = year_filter()
 df = return_df()
 
-st.markdown('### Big Numbers')
+st.header(f'Summary | {year}', divider='gray')
 col1, col2, col3 = st.columns(3)
-st.divider()
-st.markdown('### Graphs')
-col4, col5 = st.columns(2)
 
-col6 = st.columns(1)
+with col1:
+    with st.container(border=True):
+        full_averages(df, year)
+
+with col2:
+    with st.container(border=True):
+        full_sums(df, year)
+
+with col3:
+    with st.container(border=True):
+        full_counts(df, year)
 
 
-with col1.container(border=True):
-    highest_average_salary(df, year,'remote_ratio')
 
-with col2.container(border=True):
-    highest_average_salary(df, year, 'company_location')
-
-with col3.container(border=True):
-    most_frequent(df, year, 'remote_ratio')
-
+st.header('Charts', divider='gray')
 
 with st.container(border=True):
-    col7, col8, col9 = st.columns(3)
-    with col7:
-        choice2 = st.selectbox('Average Salary Throughout The Year By:', ['Employment Type', 'Experience Level', 'Company Size'])
+    st.subheader('Average salary by category')
+    col5, _, _ = st.columns(3)
+    with col5:
+        choice2 = st.selectbox('Average salary throughout the years by:', ['Employment Type', 'Experience Level', 'Company Size'])
     if choice2 == 'Employment Type':
         average_groupby_linechart(df, 'employment_type')
+        average_groupby_barchart(df, year, 'employment_type')
     elif choice2 == 'Experience Level':
         average_groupby_linechart(df, 'experience_level')
+        average_groupby_barchart(df, year, 'experience_level')
     else:
         average_groupby_linechart(df, 'company_size')
+        average_groupby_barchart(df, year, 'company_size')
 
 st.divider()
 
 with st.container(border=True):
-    choice3 = st.selectbox('Average Salary By:', ['Company Location', 'Employees Residence'])
-    st.markdown(f"### Average Salary By: {choice3}")
-    salary_map(choice3)
+    col6, _, _ = st.columns(3)
+    with col6:
+        choice3 = st.selectbox('Average throughout the years by:', ['Company Location', 'Employee Residence'])
+    salary_map(choice3, df, year)
 
 st.divider()
 
 
 with st.container(border=True):
     st.markdown('### ')
-    linechart_jobtitle()
+    linechart_jobtitle(year)
 
 
 
