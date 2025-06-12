@@ -33,12 +33,24 @@ def salary_infos():
     df_filtered2 = (df_filtered2.groupby('job_title')['growth%'].mean().sort_values(ascending=False).reset_index())
     return result
 
-def salary_map(choice, df, year):
+def salary_map(choice, df, year, tab):
+
+    match tab:
+        case 'mean':
+            title = f'Average salary by {choice.replace('_', ' ')} | {year}'
+            label = f'Average salary'
+        case 'sum':
+            title = f'Total salary by {choice.replace('_', ' ')} | {year}'
+            label = f'Total salary'
+        case 'count':
+            title = f'Number of employees by {choice.replace('_', ' ')} | {year}'
+            label = 'Number of employees'
+
     if year != 'All':
         df = df.loc[df['work_year']==year]
     
     choice = choice.lower().replace(' ', '_')
-    df_map = df.groupby(choice)['salary_in_usd'].mean().reset_index()
+    df_map = df.groupby([choice]).aggregate(salary_in_usd=('salary_in_usd', tab)).reset_index()
     fig = px.choropleth(
         df_map,
         locations=choice, 
@@ -46,8 +58,8 @@ def salary_map(choice, df, year):
         color='salary_in_usd',           
         hover_name=choice, 
         color_continuous_scale='blues',
-        title=f'Average salary by {choice.replace('_', ' ')} | {year}',
-        labels={'salary_in_usd':'Average salary'}
+        title=title,
+        labels={'salary_in_usd':label}
     )
     fig.update_layout(
         margin=dict(l=0, r=0, t=24, b=0)
@@ -86,19 +98,31 @@ def employment_type_mean():
     fig = px.bar(result, x='employment_type', y='Média Salarial', labels={'employment_type':'Tipo de Contrato'})
     st.plotly_chart(fig)
 
-def linechart_jobtitle(df, year, choice):
+def linechart_jobtitle(df, year, choice, tab):
+
+    match tab:
+        case 'mean':
+            title = f'Average job salary by {choice.replace('_', ' ')} | {year}'
+            label = f'Average salary'
+        case 'sum':
+            title = f'Total job salary by {choice.replace('_', ' ')} | {year}'
+            label = f'Total salary'
+        case 'count':
+            title = f'Number of job employees by {choice.replace('_', ' ')} | {year}'
+            label = 'Number of employees'
+
     if year != 'All':
         df = df.loc[df['work_year'] == year]
     choice = choice.lower().replace(' ', '_')
-    df = df.groupby([choice, 'job_title']).aggregate(average_salary=('salary_in_usd', 'mean')).reset_index()
+    df = df.groupby([choice, 'job_title']).aggregate(average_salary=('salary_in_usd', tab)).reset_index()
     fig = px.bar(
                 df, 
                  x='job_title', 
                  y='average_salary', 
                  color=choice, 
                  barmode='group',
-                 labels={choice: choice.title().replace('_', ' '), 'average_salary': 'Average Salary', 'job_title': 'Job Title'},
-                 title = f'Average job salary by {choice.replace('_', ' ')}'
+                 labels={choice: choice.title().replace('_', ' '), 'average_salary': label, 'job_title': 'Job title'},
+                 title = title
                  )
     fig.update_xaxes(tickangle= 45, categoryorder='category ascending')
     st.plotly_chart(fig)

@@ -69,7 +69,49 @@ def highest_average_salary(df, year, column):
             value= f'{salary}$ | {column_name}'
         )
 
+def highest_total_salary(df, year, column):
+    
+    column = column.lower().replace(' ', '_')
+
+    if year == 'All':
+        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
+        highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
+        salary = round(highest_column['average_salary'], 2)
+        column_name = highest_column[column]
+        highest_average_metric = st.metric(
+            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+            value= f'{salary}$ | {column_name}'
+        )  
+    elif (year-1) in df['work_year'].values:
+        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
+        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
+        highest_column_current_year = column_average_current_year.iloc[column_average_current_year['average_salary'].idxmax()]
+        highest_column_last_year = column_average_last_year.iloc[column_average_last_year['average_salary'].idxmax()]
+        salary_current_year = round(highest_column_current_year['average_salary'], 2)
+        salary_last_year = round(highest_column_last_year['average_salary'], 2)
+        delta = round(salary_current_year - salary_last_year, 2)
+        delta_percentage = round((delta/salary_last_year)*100, 2)
+        column_current_year = highest_column_current_year[column]
+        column_last_year = highest_column_last_year[column]
+        highest_average_metric = st.metric(
+            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+            value=f'{salary_current_year}$ | {column_current_year}',
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
+        )
+    else:
+        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','sum')).reset_index()
+        highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
+        salary = round(highest_column['average_salary'], 2)
+        column_name = highest_column[column]
+        highest_average_metric = st.metric(
+            label=f'Highest total salary {column.replace('_', ' ')} | {year}',
+            value= f'{salary}$ | {column_name}'
+        )
+
 def most_frequent(df, year, column):
+
+    column = column.lower().replace(' ', '_')
+
     if year == 'All':
         column_frequency = df.groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
         total = column_frequency['frequency'].sum()
@@ -78,7 +120,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')}',
+            label=f'Most frequent {column.replace('_', ' ')} | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )  
     elif (year-1) in df['work_year'].values:
@@ -95,9 +137,9 @@ def most_frequent(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_average_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')}',
+            label=f'Most frequent {column.replace('_', ' ')} | {year}',
             value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
-            delta=f'{delta_percentage}% | {column_last_year}',
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
             help=f"Number of employees of this category by year. The delta refers to last year's most frequent {column.replace('_', ' ')}"
         )
     else:
@@ -108,7 +150,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')}',
+            label=f'Most frequent {column.replace('_', ' ')} | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )
 
@@ -164,7 +206,7 @@ def full_sums(df, year):
     if year == 'All':
         salary_budget = round(df['salary_in_usd'].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary budget',
+            label=f'Total salary',
             value= f'{salary_budget}$'
         )  
     elif (year-1) in df['work_year'].values:
@@ -173,19 +215,31 @@ def full_sums(df, year):
         delta = round(salary_budget_current_year - salary_budget_last_year, 2)
         delta_percentage = round((delta/salary_budget_last_year)*100, 2)
         total_employees_metric = st.metric(
-            label=f'Total salary budget',
+            label=f'Total salary',
             value=f'{salary_budget_current_year}',
             delta=f'{delta_percentage}% | {delta}$'
         )
     else:
         salary_budget = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary budget',
+            label=f'Total salary',
             value= f'{salary_budget}$'
         )
 
-def average_groupby_linechart(df, column):
-    average_salary_groupby = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+def average_groupby_linechart(df, column, tab):
+
+    match tab:
+        case 'mean':
+            title = f'Average salary by {column.replace('_', ' ')} throughout the years'
+            label = f'Average salary'
+        case 'sum':
+            title = f'Total salary by {column.replace('_', ' ')} throughout the years'
+            label = f'Total salary'
+        case 'count':
+            title = f'Number of employees by {column.replace('_', ' ')} throughout the years'
+            label = 'Number of employees'
+
+    average_salary_groupby = df.groupby(['work_year', 'remote_ratio', column]).aggregate(average_salary=('salary_in_usd', tab)).reset_index()
     average_salary_groupby['work_year'] = average_salary_groupby['work_year'].astype('str')
     color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
     fig = px.line(
@@ -196,37 +250,49 @@ def average_groupby_linechart(df, column):
                 symbol='remote_ratio', 
                 facet_col=column, 
                 markers=True, 
-                labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
-                title=f'Average salary by {column.replace('_', ' ')} throughout the years',
+                labels={'work_year':'Work year', 'remote_ratio' : 'Remote ratio', 'average_salary':label}, 
+                title=title,
                 color_discrete_map=color_mapping)
     fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
     st.plotly_chart(fig)
 
-def average_groupby_barchart(df, year, column):
+def average_groupby_barchart(df, year, column, tab):
     color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
+
+    match tab:
+        case 'mean':
+            title = f'Average salary by {column.replace('_', ' ')} | {year}'
+            label = f'Average salary'
+        case 'sum':
+            title = f'Total salary by {column.replace('_', ' ')} | {year}'
+            label = f'Total salary'
+        case 'count':
+            title = f'Number of employees by {column.replace('_', ' ')} | {year}'
+            label = 'Number of employees'
+
     if year == 'All':
-        test = df.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        test = df.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd',tab)).reset_index()
         fig = px.bar(
                     test, 
                     x=column, 
                     y='average_salary', 
                     color='remote_ratio', 
                     barmode='group', 
-                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
-                    title=f'Average salary by {column.replace('_', ' ')} | {year}',
+                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':label}, 
+                    title=title,
                     color_discrete_map=color_mapping)
         fig.update_xaxes(categoryorder='category ascending')
         st.plotly_chart(fig)
     else:
         df_year = df.loc[df['work_year'] == year]
-        test = df_year.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        test = df_year.groupby([column, 'remote_ratio']).aggregate(average_salary=('salary_in_usd',tab)).reset_index()
         fig = px.bar(
                     test, x=column, 
                     y='average_salary', 
                     color='remote_ratio', 
                     barmode='group', 
-                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':'Average salary'}, 
-                    title=f'Average salary by {column.replace('_', ' ')} | {year}',
+                    labels={column:column.title().replace('_', ' '), 'remote_ratio' : 'Remote ratio', 'average_salary':label}, 
+                    title=title,
                     color_discrete_map=color_mapping)
         fig.update_xaxes(categoryorder='category ascending')
         st.plotly_chart(fig)
