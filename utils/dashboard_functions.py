@@ -58,7 +58,8 @@ def highest_average_salary(df, year, column):
         highest_average_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
             value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
-            delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest average salary"
         )
     else:
         column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
@@ -97,7 +98,8 @@ def highest_total_salary(df, year, column):
         highest_total_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
             value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
-            delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest total salary"
         )
     else:
         column_total = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
@@ -121,7 +123,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )  
     elif (year-1) in df['work_year'].values:
@@ -138,10 +140,10 @@ def most_frequent(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
-            help=f"Number of employees of this category by year. The delta refers to last year's most frequent {column.replace('_', ' ')}"
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with most employees"
         )
     else:
         column_frequency = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
@@ -151,7 +153,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )
 

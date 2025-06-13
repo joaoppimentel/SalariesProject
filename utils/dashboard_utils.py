@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import sqlite3
 import plotly.express as px
 import pycountry
-import seaborn as sns
+from numerize import numerize
 
 conn = sqlite3.connect('salaries.db', check_same_thread=False)
 cursor = conn.cursor()
@@ -51,19 +50,50 @@ def salary_map(choice, df, year, tab):
     
     choice = choice.lower().replace(' ', '_')
     df_map = df.groupby([choice]).aggregate(salary_in_usd=('salary_in_usd', tab)).reset_index()
+    df_map['full_country_name'] = df_map[choice].apply(alpha3_to_full_name)
     fig = px.choropleth(
         df_map,
-        locations=choice, 
-        locationmode='ISO-3',            
-        color='salary_in_usd',           
-        hover_name=choice, 
+        locations=choice,
+        locationmode='ISO-3',
+        color='salary_in_usd',
+        hover_name=choice,
         color_continuous_scale='blues',
         title=title,
-        labels={'salary_in_usd':label}
+        labels={'salary_in_usd':label},
+        custom_data=['full_country_name'],
+        projection='equirectangular'
     )
+
+    match tab:
+        case 'mean':
+            fig.update_traces(
+            hovertemplate=(
+                    f"{choice.capitalize().replace('_', ' ')}: %{{location}}<br>"
+                    "Country: %{customdata[0]}<br>"
+                    f"{label}: $%{{z:,.2f}}<br>"
+                )
+            )
+        case 'sum':
+            fig.update_traces(
+            hovertemplate=(
+                    f"{choice.capitalize().replace('_', ' ')}: %{{location}}<br>"
+                    "Country: %{customdata[0]}<br>"
+                    f"{label}: $%{{z:,.2f}}<br>"
+                )
+            )
+        case 'count':
+            fig.update_traces(
+            hovertemplate=(
+                    f"{choice.capitalize().replace('_', ' ')}: %{{location}}<br>"
+                    "Country: %{customdata[0]}<br>"
+                    f"{label}: %{{z:,.0f}}<br>"
+                )
+            )
+
     fig.update_layout(
         margin=dict(l=0, r=0, t=24, b=0)
     )
+    fig.update_coloraxes(colorbar_tickprefix = '$')
     st.plotly_chart(fig)
  
 
@@ -73,7 +103,14 @@ def alpha2_to_alpha3(alpha2_code):
         return country.alpha_3 if country else None
     except (AttributeError, LookupError):
         return None
-
+    
+def alpha3_to_full_name(alpha3_code):
+    try:
+        country = pycountry.countries.get(alpha_3=alpha3_code)
+        return country.name if country else alpha3_code
+    except (AttributeError, LookupError):
+        return alpha3_code
+    
 def companies_diff_salaries():
     query = """
     SELECT AVG(salary_in_usd) as "Média Salarial", company_size FROM salaries_view
