@@ -32,11 +32,14 @@ tab1, tab12, tab13 = st.tabs(['Average salary', 'Total salary expenditure', 'Num
 with tab1:
     with st.container(border=True):
         st.subheader('Average salary by category')
-        col5, col52 = st.columns([1,2], gap='large')
+        col5, col52, col53 = st.columns([1, 1.5, 1.5], gap='large')
         with col5:
             choice2 = st.selectbox('Average salary throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
         with col52:
             highest_average_salary(df, year, choice2)
+        with col53:
+            highest_average_salary(df, year, 'remote_ratio')
+
         if choice2 == 'Employment Type':
             average_groupby_linechart(df, 'employment_type', 'median')
             average_groupby_barchart(df, year, 'employment_type', 'median')
@@ -78,11 +81,14 @@ with tab1:
 with tab12:
     with st.container(border=True):
         st.subheader('Total salary expenditure by category')
-        col5, col52 = st.columns([1,2], gap='large')
+        col5, col52, col53 = st.columns([1, 1.5, 1.5], gap='large')
         with col5:
             choice2 = st.selectbox('Total salary expenditure throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
         with col52:
             highest_total_salary(df, year, choice2)
+        with col53:
+            highest_total_salary(df, year, 'remote_ratio')
+            
         if choice2 == 'Employment Type':
             average_groupby_linechart(df, 'employment_type', 'sum')
             average_groupby_barchart(df, year, 'employment_type', 'sum')
@@ -125,11 +131,14 @@ with tab12:
 with tab13:
     with st.container(border=True):
         st.subheader('Number of employees by category')
-        col5, col52 = st.columns([1,2], gap='large')
+        col5, col52, col53 = st.columns([1,1.5,1.5], gap='large')
         with col5:
             choice2 = st.selectbox('Number of employees throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
         with col52:
             most_frequent(df, year, choice2)
+        with col53:
+            most_frequent(df, year, 'remote_ratio')
+
         if choice2 == 'Employment Type':
             average_groupby_linechart(df, 'employment_type', 'count')
             average_groupby_barchart(df, year, 'employment_type', 'count')
