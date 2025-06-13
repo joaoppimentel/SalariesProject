@@ -36,7 +36,7 @@ def highest_average_salary(df, year, column):
     column = column.lower().replace(' ', '_')
 
     if year == 'All':
-        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
@@ -45,8 +45,8 @@ def highest_average_salary(df, year, column):
             value= f'${numerize.numerize(salary)} | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
-        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
-        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
+        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column_current_year = column_average_current_year.iloc[column_average_current_year['average_salary'].idxmax()]
         highest_column_last_year = column_average_last_year.iloc[column_average_last_year['average_salary'].idxmax()]
         salary_current_year = round(highest_column_current_year['average_salary'], 2)
@@ -62,7 +62,7 @@ def highest_average_salary(df, year, column):
             help=f"The delta refers to last year's {column.replace('_', ' ')} with highest average salary"
         )
     else:
-        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
@@ -183,14 +183,14 @@ def full_counts(df, year):
 
 def full_averages(df, year):
     if year == 'All':
-        average_salary = round(df['salary_in_usd'].mean(), 2)
+        average_salary = round(df['salary_in_usd'].median(), 2)
         average_salary_metric = st.metric(
             label=f'Overall average salary',
             value= f'${numerize.numerize(average_salary)}'
         )  
     elif (year-1) in df['work_year'].values:
-        average_salary_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
-        average_salary_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].mean(), 2)
+        average_salary_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].median(), 2)
+        average_salary_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].median(), 2)
         delta = round(average_salary_current_year - average_salary_last_year, 2)
         delta_percentage = round((delta/average_salary_last_year)*100, 2)
         total_employees_metric = st.metric(
@@ -199,7 +199,7 @@ def full_averages(df, year):
             delta=f'{delta_percentage}% | ${delta}'
         )
     else:
-        average_salary = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
+        average_salary = round(df['salary_in_usd'].loc[df['work_year'] == year].median(), 2)
         average_salary_metric = st.metric(
             label=f'Overall average salary',
             value= f'${numerize.numerize(average_salary)}'
@@ -232,7 +232,7 @@ def full_sums(df, year):
 def average_groupby_linechart(df, column, tab):
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average salary by {column.replace('_', ' ')} throughout the years'
             label = f'Average salary'
         case 'sum':
@@ -263,7 +263,7 @@ def average_groupby_barchart(df, year, column, tab):
     color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average salary by {column.replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':

@@ -35,7 +35,7 @@ def salary_infos():
 def salary_map(choice, df, year, tab):
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
@@ -138,7 +138,7 @@ def employment_type_mean():
 def linechart_jobtitle(df, year, choice, tab):
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average job salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
