@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import sqlite3
 import plotly.express as px
+from numerize import numerize
 
 def year_filter():
 
@@ -35,17 +36,17 @@ def highest_average_salary(df, year, column):
     column = column.lower().replace(' ', '_')
 
     if year == 'All':
-        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average = df.groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
-            value= f'{salary}$ | {column_name}'
+            value= f'${numerize.numerize(salary)} | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
-        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
-        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
+        column_average_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column_current_year = column_average_current_year.iloc[column_average_current_year['average_salary'].idxmax()]
         highest_column_last_year = column_average_last_year.iloc[column_average_last_year['average_salary'].idxmax()]
         salary_current_year = round(highest_column_current_year['average_salary'], 2)
@@ -56,17 +57,18 @@ def highest_average_salary(df, year, column):
         column_last_year = highest_column_last_year[column]
         highest_average_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
-            value=f'{salary_current_year}$ | {column_current_year}',
-            delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
+            value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest average salary"
         )
     else:
-        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','mean')).reset_index()
+        column_average = df.loc[df['work_year'] == year].groupby([column]).aggregate(average_salary=('salary_in_usd','median')).reset_index()
         highest_column = column_average.iloc[column_average['average_salary'].idxmax()]
         salary = round(highest_column['average_salary'], 2)
         column_name = highest_column[column]
         highest_average_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest average salary | {year}',
-            value= f'{salary}$ | {column_name}'
+            value= f'${numerize.numerize(salary)} | {column_name}'
         )
 
 def highest_total_salary(df, year, column):
@@ -79,8 +81,8 @@ def highest_total_salary(df, year, column):
         salary = round(highest_column['total_salary'], 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
-            value= f'{salary}$ | {column_name}'
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
+            value= f'${numerize.numerize(salary)} | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
         column_total_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
@@ -94,18 +96,19 @@ def highest_total_salary(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
-            value=f'{salary_current_year}$ | {column_current_year}',
-            delta=f'{delta_percentage}% | {column_last_year} | {year-1}'
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
+            value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
+            delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest total salary expenditure"
         )
     else:
         column_total = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
         highest_column = column_total.iloc[column_total['total_salary'].idxmax()]
-        salary = round(highest_column['average_salary'], 2)
+        salary = round(highest_column['total_salary'], 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
-            value= f'{salary}$ | {column_name}'
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
+            value= f'${numerize.numerize(salary)} | {column_name}'
         )
 
 def most_frequent(df, year, column):
@@ -120,7 +123,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )  
     elif (year-1) in df['work_year'].values:
@@ -137,10 +140,10 @@ def most_frequent(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value=f'{frequency_current_year} | {column_current_year} | {frequency_current_year_percentage}%',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
-            help=f"Number of employees of this category by year. The delta refers to last year's most frequent {column.replace('_', ' ')}"
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with most employees"
         )
     else:
         column_frequency = df.loc[df['work_year'] == year].groupby([column]).aggregate(frequency=('salary_in_usd','count')).reset_index()
@@ -150,7 +153,7 @@ def most_frequent(df, year, column):
         frequency_percentage = round((frequency/total)*100, 2)
         column_name = highest_column[column]
         highest_frequency_metric = st.metric(
-            label=f'Most frequent {column.replace('_', ' ')} | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with most employees | {year}',
             value= f'{frequency} | {column_name} | {frequency_percentage}%'
         )
 
@@ -180,34 +183,34 @@ def full_counts(df, year):
 
 def full_averages(df, year):
     if year == 'All':
-        average_salary = round(df['salary_in_usd'].mean(), 2)
+        average_salary = round(df['salary_in_usd'].median(), 2)
         average_salary_metric = st.metric(
             label=f'Overall average salary',
-            value= f'{average_salary}$'
+            value= f'${numerize.numerize(average_salary)}'
         )  
     elif (year-1) in df['work_year'].values:
-        average_salary_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
-        average_salary_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].mean(), 2)
+        average_salary_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].median(), 2)
+        average_salary_last_year = round(df['salary_in_usd'].loc[df['work_year'] == year-1].median(), 2)
         delta = round(average_salary_current_year - average_salary_last_year, 2)
         delta_percentage = round((delta/average_salary_last_year)*100, 2)
         total_employees_metric = st.metric(
             label=f'Overall average salary',
-            value=f'{average_salary_current_year}',
-            delta=f'{delta_percentage}% | {delta}$'
+            value=f'${numerize.numerize(average_salary_current_year)}',
+            delta=f'{delta_percentage}% | ${delta}'
         )
     else:
-        average_salary = round(df['salary_in_usd'].loc[df['work_year'] == year].mean(), 2)
+        average_salary = round(df['salary_in_usd'].loc[df['work_year'] == year].median(), 2)
         average_salary_metric = st.metric(
             label=f'Overall average salary',
-            value= f'{average_salary}$'
+            value= f'${numerize.numerize(average_salary)}'
         )
 
 def full_sums(df, year):
     if year == 'All':
         salary_budget = round(df['salary_in_usd'].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary',
-            value= f'{salary_budget}$'
+            label=f'Total salary expenditure',
+            value= f'${numerize.numerize(salary_budget)}'
         )  
     elif (year-1) in df['work_year'].values:
         salary_budget_current_year = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
@@ -215,26 +218,26 @@ def full_sums(df, year):
         delta = round(salary_budget_current_year - salary_budget_last_year, 2)
         delta_percentage = round((delta/salary_budget_last_year)*100, 2)
         total_employees_metric = st.metric(
-            label=f'Total salary',
-            value=f'{salary_budget_current_year}',
-            delta=f'{delta_percentage}% | {delta}$'
+            label=f'Total salary expenditure',
+            value=f'${numerize.numerize(salary_budget_current_year)}',
+            delta=f'{delta_percentage}% | ${numerize.numerize(delta)}'
         )
     else:
         salary_budget = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary',
-            value= f'{salary_budget}$'
+            label=f'Total salary expenditure',
+            value= f'${numerize.numerize(salary_budget)}'
         )
 
 def average_groupby_linechart(df, column, tab):
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average salary by {column.replace('_', ' ')} throughout the years'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {column.replace('_', ' ')} throughout the years'
-            label = f'Total salary'
+            title = f'Total salary expenditure by {column.replace('_', ' ')} throughout the years'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of employees by {column.replace('_', ' ')} throughout the years'
             label = 'Number of employees'
@@ -260,12 +263,12 @@ def average_groupby_barchart(df, year, column, tab):
     color_mapping = {'No Remote': '#ed4840', 'Parcially Remote': '#bcddf2', 'Full Remote': '#406ec1'}
 
     match tab:
-        case 'mean':
+        case 'median':
             title = f'Average salary by {column.replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {column.replace('_', ' ')} | {year}'
-            label = f'Total salary'
+            title = f'Total salary expenditure by {column.replace('_', ' ')} | {year}'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of employees by {column.replace('_', ' ')} | {year}'
             label = 'Number of employees'

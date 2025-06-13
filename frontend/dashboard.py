@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-from utils.dashboard_utils import salary_infos, salary_map, companies_diff_salaries, employment_type_mean, linechart_jobtitle
+from utils.dashboard_utils import salary_map, linechart_jobtitle
 from utils.dashboard_functions import year_filter, return_df, highest_average_salary, most_frequent, full_counts, average_groupby_linechart, full_averages, average_groupby_barchart, full_sums, highest_total_salary
-import seaborn as sns
 
 
 st.title("📊 Salaries Dashboard")
@@ -27,9 +26,9 @@ with col3:
 
 
 st.header('Charts', divider='gray')
-tab1, tab12, tab13 = st.tabs(['Average salary', 'Total salary', 'Number of employees'])
+tab1, tab12, tab13 = st.tabs(['Average salary', 'Total salary expenditure', 'Number of employees'])
 
-# Mean
+# median
 with tab1:
     with st.container(border=True):
         st.subheader('Average salary by category')
@@ -39,14 +38,14 @@ with tab1:
         with col52:
             highest_average_salary(df, year, choice2)
         if choice2 == 'Employment Type':
-            average_groupby_linechart(df, 'employment_type', 'mean')
-            average_groupby_barchart(df, year, 'employment_type', 'mean')
+            average_groupby_linechart(df, 'employment_type', 'median')
+            average_groupby_barchart(df, year, 'employment_type', 'median')
         elif choice2 == 'Experience Level':
-            average_groupby_linechart(df, 'experience_level', 'mean')
-            average_groupby_barchart(df, year, 'experience_level', 'mean')
+            average_groupby_linechart(df, 'experience_level', 'median')
+            average_groupby_barchart(df, year, 'experience_level', 'median')
         else:
-            average_groupby_linechart(df, 'company_size', 'mean')
-            average_groupby_barchart(df, year, 'company_size', 'mean')
+            average_groupby_linechart(df, 'company_size', 'median')
+            average_groupby_barchart(df, year, 'company_size', 'median')
 
     st.divider()
 
@@ -59,7 +58,7 @@ with tab1:
         with col62:
             highest_average_salary(df, year, choice3)
 
-        salary_map(choice3, df, year, 'mean')
+        salary_map(choice3, df, year, 'median')
 
     st.divider()
 
@@ -74,14 +73,14 @@ with tab1:
         with col72:
             highest_average_salary(df, year, 'job_title')
 
-        linechart_jobtitle(df, year, choice, 'mean')
+        linechart_jobtitle(df, year, choice, 'median')
 # Sum
 with tab12:
     with st.container(border=True):
-        st.subheader('Total salary by category')
+        st.subheader('Total salary expenditure by category')
         col5, col52 = st.columns([1,2], gap='large')
         with col5:
-            choice2 = st.selectbox('Total salary throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
+            choice2 = st.selectbox('Total salary expenditure throughout the years by:', ['Company Size', 'Experience Level', 'Employment Type'])
         with col52:
             highest_total_salary(df, year, choice2)
         if choice2 == 'Employment Type':
@@ -97,10 +96,10 @@ with tab12:
     st.divider()
 
     with st.container(border=True):
-        st.subheader('Total salary by country')
+        st.subheader('Total salary expenditure by country')
         col6, col62 = st.columns([1,2], gap='large')
         with col6:
-            choice3 = st.selectbox('Total salary by country of:', ['Company Location', 'Employee Residence'])
+            choice3 = st.selectbox('Total salary expenditure by country of:', ['Company Location', 'Employee Residence'])
 
         with col62:
             highest_total_salary(df, year, choice3)
@@ -111,11 +110,11 @@ with tab12:
 
 
     with st.container(border=True):
-        st.subheader('Total job salary by category')
+        st.subheader('Total job salary expenditure by category')
         col7, col72 = st.columns([1,2], gap='large')
         
         with col7:
-            choice = st.selectbox('Total job salary by:', ['Company Size', 'Experience Level', 'Employment Type', 'Remote Ratio'])
+            choice = st.selectbox('Total job salary expenditure by:', ['Company Size', 'Experience Level', 'Employment Type', 'Remote Ratio'])
         
         with col72:
             highest_total_salary(df, year, 'job_title')
