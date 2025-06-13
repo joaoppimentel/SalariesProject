@@ -3,7 +3,6 @@ import pandas as pd
 import sqlite3
 import plotly.express as px
 import pycountry
-from numerize import numerize
 
 conn = sqlite3.connect('salaries.db', check_same_thread=False)
 cursor = conn.cursor()
