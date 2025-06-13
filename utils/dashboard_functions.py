@@ -77,19 +77,23 @@ def highest_total_salary(df, year, column):
 
     if year == 'All':
         column_total = df.groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        total = column_total['total_salary'].sum()
         highest_column = column_total.iloc[column_total['total_salary'].idxmax()]
         salary = round(highest_column['total_salary'], 2)
+        salary_percentage = round((salary/total)*100, 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
-            value= f'${numerize.numerize(salary)} | {column_name}'
+            value= f'${numerize.numerize(salary)} | {column_name} | {salary_percentage}%'
         )  
     elif (year-1) in df['work_year'].values:
         column_total_current_year = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        total = column_total_current_year['total_salary'].sum()
         column_total_last_year = df.loc[df['work_year'] == year-1].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
         highest_column_current_year = column_total_current_year.iloc[column_total_current_year['total_salary'].idxmax()]
         highest_column_last_year = column_total_last_year.iloc[column_total_last_year['total_salary'].idxmax()]
         salary_current_year = round(highest_column_current_year['total_salary'], 2)
+        salary_current_year_percentage = round((salary_current_year/total)*100, 2)
         salary_last_year = round(highest_column_last_year['total_salary'], 2)
         delta = round(salary_current_year - salary_last_year, 2)
         delta_percentage = round((delta/salary_last_year)*100, 2)
@@ -97,18 +101,20 @@ def highest_total_salary(df, year, column):
         column_last_year = highest_column_last_year[column]
         highest_total_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
-            value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
+            value=f'${numerize.numerize(salary_current_year)} | {column_current_year} | {salary_current_year_percentage}%',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
             help=f"The delta refers to last year's {column.replace('_', ' ')} with highest total salary expenditure"
         )
     else:
         column_total = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
+        total = column_total['total_salary'].sum()
         highest_column = column_total.iloc[column_total['total_salary'].idxmax()]
         salary = round(highest_column['total_salary'], 2)
+        salary_percentage = round((salary/total)*100, 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
-            value= f'${numerize.numerize(salary)} | {column_name}'
+            value= f'${numerize.numerize(salary)} | {column_name} | {salary_percentage}'
         )
 
 def most_frequent(df, year, column):
