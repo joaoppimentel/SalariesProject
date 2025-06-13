@@ -114,7 +114,7 @@ def highest_total_salary(df, year, column):
         column_name = highest_column[column]
         highest_total_metric = st.metric(
             label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
-            value= f'${numerize.numerize(salary)} | {column_name} | {salary_percentage}'
+            value= f'${numerize.numerize(salary)} | {column_name} | {salary_percentage}%'
         )
 
 def most_frequent(df, year, column):
