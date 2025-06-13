@@ -81,7 +81,7 @@ def highest_total_salary(df, year, column):
         salary = round(highest_column['total_salary'], 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
             value= f'${numerize.numerize(salary)} | {column_name}'
         )  
     elif (year-1) in df['work_year'].values:
@@ -96,10 +96,10 @@ def highest_total_salary(df, year, column):
         column_current_year = highest_column_current_year[column]
         column_last_year = highest_column_last_year[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
             value=f'${numerize.numerize(salary_current_year)} | {column_current_year}',
             delta=f'{delta_percentage}% | {column_last_year} | {year-1}',
-            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest total salary"
+            help=f"The delta refers to last year's {column.replace('_', ' ')} with highest total salary expenditure"
         )
     else:
         column_total = df.loc[df['work_year'] == year].groupby([column]).aggregate(total_salary=('salary_in_usd','sum')).reset_index()
@@ -107,7 +107,7 @@ def highest_total_salary(df, year, column):
         salary = round(highest_column['total_salary'], 2)
         column_name = highest_column[column]
         highest_total_metric = st.metric(
-            label=f'{column.capitalize().replace('_', ' ')} with highest total salary | {year}',
+            label=f'{column.capitalize().replace('_', ' ')} with highest total salary expenditure | {year}',
             value= f'${numerize.numerize(salary)} | {column_name}'
         )
 
@@ -209,7 +209,7 @@ def full_sums(df, year):
     if year == 'All':
         salary_budget = round(df['salary_in_usd'].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary',
+            label=f'Total salary expenditure',
             value= f'${numerize.numerize(salary_budget)}'
         )  
     elif (year-1) in df['work_year'].values:
@@ -218,14 +218,14 @@ def full_sums(df, year):
         delta = round(salary_budget_current_year - salary_budget_last_year, 2)
         delta_percentage = round((delta/salary_budget_last_year)*100, 2)
         total_employees_metric = st.metric(
-            label=f'Total salary',
+            label=f'Total salary expenditure',
             value=f'${numerize.numerize(salary_budget_current_year)}',
             delta=f'{delta_percentage}% | ${numerize.numerize(delta)}'
         )
     else:
         salary_budget = round(df['salary_in_usd'].loc[df['work_year'] == year].sum(), 2)
         average_salary_metric = st.metric(
-            label=f'Total salary',
+            label=f'Total salary expenditure',
             value= f'${numerize.numerize(salary_budget)}'
         )
 
@@ -236,8 +236,8 @@ def average_groupby_linechart(df, column, tab):
             title = f'Average salary by {column.replace('_', ' ')} throughout the years'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {column.replace('_', ' ')} throughout the years'
-            label = f'Total salary'
+            title = f'Total salary expenditure by {column.replace('_', ' ')} throughout the years'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of employees by {column.replace('_', ' ')} throughout the years'
             label = 'Number of employees'
@@ -267,8 +267,8 @@ def average_groupby_barchart(df, year, column, tab):
             title = f'Average salary by {column.replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {column.replace('_', ' ')} | {year}'
-            label = f'Total salary'
+            title = f'Total salary expenditure by {column.replace('_', ' ')} | {year}'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of employees by {column.replace('_', ' ')} | {year}'
             label = 'Number of employees'

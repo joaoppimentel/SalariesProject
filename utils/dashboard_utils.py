@@ -39,8 +39,8 @@ def salary_map(choice, df, year, tab):
             title = f'Average salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total salary by {choice.lower().replace('_', ' ')} | {year}'
-            label = f'Total salary'
+            title = f'Total salary expenditure by {choice.lower().replace('_', ' ')} | {year}'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of employees by {choice.lower().replace('_', ' ')} | {year}'
             label = 'Number of employees'
@@ -142,8 +142,8 @@ def linechart_jobtitle(df, year, choice, tab):
             title = f'Average job salary by {choice.lower().replace('_', ' ')} | {year}'
             label = f'Average salary'
         case 'sum':
-            title = f'Total job salary by {choice.lower().replace('_', ' ')} | {year}'
-            label = f'Total salary'
+            title = f'Total job salary expenditure by {choice.lower().replace('_', ' ')} | {year}'
+            label = f'Total salary expenditure'
         case 'count':
             title = f'Number of job employees by {choice.lower().replace('_', ' ')} | {year}'
             label = 'Number of employees'
